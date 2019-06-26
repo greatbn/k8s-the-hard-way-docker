@@ -1,0 +1,36 @@
+version: "2"
+services:
+  kubelet:
+    image: gcr.io/google_containers/hyperkube:v1.12.0
+    command: ["kubelet", "--config=/var/lib/kubelet/kubelet-config.yaml", "--kubeconfig=/var/lib/kubelet/kubeconfig", "--register-node=true", "--v=2", "--network-plugin=cni"]
+    network_mode: host
+    privileged: True
+    pid: host
+    volumes:
+      - /var/lib/kubelet/kubelet-config.yaml:/var/lib/kubelet/kubelet-config.yaml
+      - /var/lib/kubelet/kubeconfig:/var/lib/kubelet/kubeconfig
+      - /var/lib/kubernetes/ca.pem:/var/lib/kubernetes/ca.pem
+      - /var/lib/kubelet/sapd-worker-1.pem:/var/lib/kubelet/sapd-worker-1.pem
+      - /var/lib/kubelet/sapd-worker-1-key.pem:/var/lib/kubelet/sapd-worker-1-key.pem
+      - /run/systemd/resolve/resolv.conf:/run/systemd/resolve/resolv.conf
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/kubelet:/var/lib/kubelet:shared,z
+      - /var/lib/docker:/var/lib/docker:rw,rslave,z
+      - /var/run:/var/run:rw,rprivate
+      - /run:/run:rprivate
+      - /dev:/host/dev:rprivate
+      - /usr:/host/usr:ro
+      - /etc:/host/etc:ro
+      - /sys:/sys:rprivate
+      - /etc/cni:/etc/cni:rw,z
+      - /opt/cni:/opt/cni:rw,z
+      - /var/lib/calico:/var/lib/calico:z
+  kube-proxy:
+    image: gcr.io/google_containers/hyperkube:v1.12.0
+    command: ["kube-proxy", "--config=/var/lib/kube-proxy/kube-proxy-config.yaml"]
+    network_mode: host
+    privileged: True
+    volumes:
+      - /var/lib/kube-proxy/kubeconfig:/var/lib/kube-proxy/kubeconfig
+      - /var/lib/kube-proxy/kube-proxy-config.yaml:/var/lib/kube-proxy/kube-proxy-config.yaml
+      - /run:/run
