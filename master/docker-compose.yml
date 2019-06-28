@@ -1,10 +1,21 @@
 version: "2"
 services:
+  etcd1:
+    image: rancher/coreos-etcd:v3.2.24-rancher1
+    network_mode: host
+    entrypoint: ["sh", "/etc/etcd/etcd.sh"]
+    volumes:
+      - /etc/etcd/etcd.sh:/etc/etcd/etcd.sh
+#      - /etc/kubernetes/certs/ca.crt:/etc/kubernetes/certs/ca.crt
+#      - /etc/kubernetes/certs/server.key:/etc/kubernetes/certs/server.key
+#      - /etc/kubernetes/certs/server.crt:/etc/kubernetes/certs/server.crt
+      - /etc/kubernetes:/etc/kubernetes:z
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
   kube-apiserver:
     image: gcr.io/google_containers/hyperkube:v1.12.0
     network_mode: host
     entrypoint: ["kube-apiserver",
-      "--advertise-address=10.20.165.26",
+      "--advertise-address=10.20.165.21",
       "--allow-privileged=true",
       "--apiserver-count=3",
       "--audit-log-maxage=30", 
@@ -13,34 +24,31 @@ services:
       "--audit-log-path=/var/log/audit.log",
       "--authorization-mode=Node,RBAC",
       "--bind-address=0.0.0.0",
-      "--client-ca-file=/var/lib/kubernetes/ca.pem",
+      "--client-ca-file=/etc/kubernetes/certs/ca.crt",
       "--enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota",
       "--enable-swagger-ui=true",
       "--etcd-cafile=/var/lib/kubernetes/ca.pem",
-      "--etcd-certfile=/var/lib/kubernetes/kubernetes.pem",
-      "--etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem",
-      "--etcd-servers=https://10.20.165.26:2379",
+      "--etcd-certfile=/etc/kubernetes/certs/server.crt",
+      "--etcd-keyfile=/etc/kubernetes/certs/server.key",
+      "--etcd-servers=https://10.20.165.21:2379",
       "--event-ttl=1h",
-      "--experimental-encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml",
-      "--kubelet-certificate-authority=/var/lib/kubernetes/ca.pem",
-      "--kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem",
-      "--kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem",
+      "--experimental-encryption-provider-config=/etc/kubernetes/encryption-config.yaml",
+      "--kubelet-certificate-authority=/etc/kubernetes/certs/ca.crt",
+      "--kubelet-client-certificate=/etc/kubernetes/certs/server.crt",
+      "--kubelet-client-key=/etc/kubernetes/certs/server.key",
       "--kubelet-https=true",
       "--runtime-config=api/all",
-      "--service-account-key-file=/var/lib/kubernetes/service-account.pem",
+      "--service-account-key-file=/etc/kubernetes/certs/service-account.key",
       "--service-cluster-ip-range=10.32.0.0/24",
       "--service-node-port-range=30000-32767",
-      "--tls-cert-file=/var/lib/kubernetes/kubernetes.pem",
-      "--tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem",
+      "--tls-cert-file=/etc/kubernetes/certs/server.crt",
+      "--tls-private-key-file=/etc/kubernetes/certs/server.key",
       "--v=2"]
     ports:
        - 6443:6443
     volumes:
-      - /var/lib/kubernetes/ca.pem:/var/lib/kubernetes/ca.pem
-      - /var/lib/kubernetes/kubernetes.pem:/var/lib/kubernetes/kubernetes.pem
-      - /var/lib/kubernetes/kubernetes-key.pem:/var/lib/kubernetes/kubernetes-key.pem
-      - /var/lib/kubernetes/encryption-config.yaml:/var/lib/kubernetes/encryption-config.yaml
-      - /var/lib/kubernetes/service-account.pem:/var/lib/kubernetes/service-account.pem
+      - /etc/kubernetes/certs/:/etc/kubernetes/certs/
+      - /etc/kubernetes/:/etc/kubernetes/
   kube-controller-manager:
     image: gcr.io/google_containers/hyperkube:v1.12.0
     network_mode: host
@@ -69,3 +77,5 @@ services:
     volumes:
      - /etc/kubernetes/config/kube-scheduler.yaml:/etc/kubernetes/config/kube-scheduler.yaml
      - /var/lib/kubernetes/kube-scheduler.kubeconfig:/var/lib/kubernetes/kube-scheduler.kubeconfig
+
+
