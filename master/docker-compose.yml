@@ -27,7 +27,7 @@ services:
       "--client-ca-file=/etc/kubernetes/certs/ca.crt",
       "--enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota",
       "--enable-swagger-ui=true",
-      "--etcd-cafile=/var/lib/kubernetes/ca.pem",
+      "--etcd-cafile=/etc/kubernetes/certs/ca.crt",
       "--etcd-certfile=/etc/kubernetes/certs/server.crt",
       "--etcd-keyfile=/etc/kubernetes/certs/server.key",
       "--etcd-servers=https://10.20.165.21:2379",
@@ -56,26 +56,22 @@ services:
       "--address=0.0.0.0",
       "--cluster-cidr=10.200.0.0/16",
       "--cluster-name=kubernetes",
-      "--cluster-signing-cert-file=/var/lib/kubernetes/ca.pem",
-      "--cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem",
-      "--kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig",
+      "--kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig",
       "--leader-elect=true",
-      "--root-ca-file=/var/lib/kubernetes/ca.pem",
-      "--service-account-private-key-file=/var/lib/kubernetes/service-account-key.pem",
+      "--root-ca-file=/etc/kubernetes/certs/ca.crt",
+      "--service-account-private-key-file=/etc/kubernetes/certs/service-account.key",
       "--service-cluster-ip-range=10.32.0.0/24",
       "--use-service-account-credentials=true",
       "--v=2"]
     volumes:
-      - /var/lib/kubernetes/ca.pem:/var/lib/kubernetes/ca.pem
-      - /var/lib/kubernetes/ca-key.pem:/var/lib/kubernetes/ca-key.pem
-      - /var/lib/kubernetes/kube-controller-manager.kubeconfig:/var/lib/kubernetes/kube-controller-manager.kubeconfig
-      - /var/lib/kubernetes/service-account-key.pem:/var/lib/kubernetes/service-account-key.pem
+      - /etc/kubernetes/certs/:/etc/kubernetes/certs/
+      - /etc/kubernetes/:/etc/kubernetes/
   kube-scheduler:
     image: gcr.io/google_containers/hyperkube:v1.12.0
     network_mode: host
-    entrypoint: ["kube-scheduler", "--config=/etc/kubernetes/config/kube-scheduler.yaml", "--v=2"]
+    entrypoint: ["kube-scheduler", "--config=/etc/kubernetes/kube-scheduler.yaml", "--v=2"]
     volumes:
-     - /etc/kubernetes/config/kube-scheduler.yaml:/etc/kubernetes/config/kube-scheduler.yaml
-     - /var/lib/kubernetes/kube-scheduler.kubeconfig:/var/lib/kubernetes/kube-scheduler.kubeconfig
+     - /etc/kubernetes/certs/:/etc/kubernetes/certs/
+     - /etc/kubernetes/:/etc/kubernetes/
 
 
