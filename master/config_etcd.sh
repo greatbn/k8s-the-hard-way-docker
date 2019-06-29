@@ -1,7 +1,10 @@
 
-myip="10.20.165.13"
+if [ -z "${myip}" ]; then
+	myip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+fi
+
 protocol="https"
-ETCD_DISCOVERY_URL="https://discovery.etcd.io/9d5ff9a89c39c63b40f3d28201520d34"
+ETCD_DISCOVERY_URL="https://discovery.etcd.io/1ad09a306ba12df345df766b4b7e1feb"
 cert_dir="/etc/kubernetes/certs"
 
 mkdir -p /etc/etcd/
