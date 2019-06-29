@@ -47,6 +47,7 @@ services:
       "--service-node-port-range=30000-32767",
       "--tls-cert-file=/etc/kubernetes/certs/server.crt",
       "--tls-private-key-file=/etc/kubernetes/certs/server.key",
+      "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname",
       "--v=2"]
     ports:
        - 6443:6443
