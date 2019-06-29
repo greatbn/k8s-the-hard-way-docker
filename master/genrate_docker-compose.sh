@@ -1,3 +1,10 @@
+#!/bin/bash
+
+if [ -z "${myip}" ]; then
+        myip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+fi
+
+cat >  docker-compose.yml <<EOF
 version: "2"
 services:
   etcd1:
@@ -12,7 +19,7 @@ services:
     image: gcr.io/google_containers/hyperkube:v1.12.0
     network_mode: host
     entrypoint: ["kube-apiserver",
-      "--advertise-address=10.20.165.19",
+      "--advertise-address=$myip",
       "--allow-privileged=true",
       "--apiserver-count=3",
       "--audit-log-maxage=30", 
@@ -27,7 +34,7 @@ services:
       "--etcd-cafile=/etc/kubernetes/certs/ca.crt",
       "--etcd-certfile=/etc/kubernetes/certs/server.crt",
       "--etcd-keyfile=/etc/kubernetes/certs/server.key",
-      "--etcd-servers=https://10.20.165.19:2379",
+      "--etcd-servers=https://$myip:2379",
       "--event-ttl=1h",
       "--experimental-encryption-provider-config=/etc/kubernetes/encryption-config.yaml",
       "--kubelet-certificate-authority=/etc/kubernetes/certs/ca.crt",
@@ -70,4 +77,4 @@ services:
     volumes:
      - /etc/kubernetes/certs/:/etc/kubernetes/certs/
      - /etc/kubernetes/:/etc/kubernetes/
-
+EOF
