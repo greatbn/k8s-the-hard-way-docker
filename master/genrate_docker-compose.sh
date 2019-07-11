@@ -42,7 +42,7 @@ services:
       "--kubelet-client-key=/etc/kubernetes/certs/server.key",
       "--kubelet-https=true",
       "--runtime-config=api/all",
-      "--service-account-key-file=/etc/kubernetes/certs/service-account.key",
+      "--service-account-key-file=/etc/kubernetes/certs/service-account.crt",
       "--service-cluster-ip-range=10.32.0.0/24",
       "--service-node-port-range=30000-32767",
       "--tls-cert-file=/etc/kubernetes/certs/server.crt",
